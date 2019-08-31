@@ -24,7 +24,7 @@ namespace Laboratorio_Compresión.Controllers
                 {
                     string path = Path.Combine(Server.MapPath("~/Archivos"), Path.GetFileName(file.FileName));
                     file.SaveAs(path);
-                    ViewBag.Message = "File uploaded successfully";
+                    ViewBag.Message = "Carga Exitosa";
                 }
                 catch (Exception ex)
                 {
@@ -32,11 +32,28 @@ namespace Laboratorio_Compresión.Controllers
                 }
             else
             {
-                ViewBag.Message = "You have not specified a file.";
+                ViewBag.Message = "No ha especificado un archivo.";
             }
             return View();
         }
 
+        public ActionResult DownloadFile()
+        {
+            string filename = "Poster.pdf";
+            string filepath = Server.MapPath("~/Archivos/") +  filename;
+            byte[] filedata = System.IO.File.ReadAllBytes(filepath);
+            string contentType = MimeMapping.GetMimeMapping(filepath);
+
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = filename,
+                Inline = true,
+            };
+
+            Response.AppendHeader("Content-Disposition", cd.ToString());
+
+            return File(filedata, contentType);
+        }
 
         public ActionResult About()
         {

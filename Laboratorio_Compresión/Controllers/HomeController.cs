@@ -68,14 +68,15 @@ namespace Laboratorio_Compresión.Controllers
                 {
                     if (!didid.Keys.Contains(item))
                     {
-                        didid.Add(item, 0);
+                        didid.Add(item, 1);
                     }
                     else
                     {
                         didid[item]++;
                     }
                 }
-                int v;
+                int v = 0;
+
             }
             return View(Caracteres);
         }

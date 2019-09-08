@@ -4,11 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Laboratorio_Compresión.Models;
 
 namespace Laboratorio_Compresión.Controllers
 {
     public class HomeController : Controller
     {
+        //Lista de archivos comprimidos
+        public static List<MisCompresiones> misCompresiones = new List<MisCompresiones>();
+
         public ActionResult Index()
         {
             return View();
@@ -25,6 +29,8 @@ namespace Laboratorio_Compresión.Controllers
                     string path = Path.Combine(Server.MapPath("~/Archivos"), Path.GetFileName(file.FileName));
                     file.SaveAs(path);
                     ViewBag.Message = "Carga Exitosa";
+
+                    comprimir(path);
                 }
                 catch (Exception ex)
                 {
@@ -34,8 +40,35 @@ namespace Laboratorio_Compresión.Controllers
             {
                 ViewBag.Message = "No ha especificado un archivo.";
             }
+
             return View();
         }
+
+        public void comprimir(string path)
+        {
+            string Data = System.IO.File.ReadAllText(path);
+            List<char> Caracteres = Data.ToList<char>();
+
+            Dictionary<char, int> dictionary = new Dictionary<char, int>();
+
+            foreach (var item in Caracteres)
+            {
+                if (!dictionary.Keys.Contains(item))
+                {
+                    dictionary.Add(item, 1);
+                }
+                else
+                {
+                    dictionary[item]++;
+                }
+            }
+
+            //Crear arbol Huffman
+            ArbolBinario arbol = new ArbolBinario(dictionary);
+            Dictionary<char, string> diccionario = arbol.obtenerDiccionarioBinario();
+
+            diccionario.Add('+', ""); //Test
+        }//No se como sirve pero no tocar
 
         public ActionResult DownloadFile()
         {
@@ -54,6 +87,7 @@ namespace Laboratorio_Compresión.Controllers
 
             return File(filedata, contentType);
         }
+
 
         public ActionResult About()
         {

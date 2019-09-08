@@ -12,7 +12,16 @@ namespace Laboratorio_Compresión
 
         public bool esVacio { get { return Raiz == null; } }
 
+        //Constructor 
+        public ArbolBinario() { }
+
+        public ArbolBinario(Dictionary<char, int> lista)
+        {
+            this.crearArbol(lista);
+        }
         
+        //Operations
+
         public void crearArbol(Dictionary<char, int> lista)
         {
 
@@ -72,12 +81,12 @@ namespace Laboratorio_Compresión
             return padre;
         }
 
-        public Dictionary<char, List<bool>> obtenerDiccionarioBinario()
+        public Dictionary<char, string> obtenerDiccionarioBinario()
         {
             // Devueleve un diccionario con pares de caracter y binario
 
-            Dictionary<char, List<bool>> diccionario = new Dictionary<char, List<bool>>();
-            List<bool> binario = new List<bool>();
+            Dictionary<char, string> diccionario = new Dictionary<char, string>();
+            string binario = "";
 
             //Llamada a recorrer el arbol binario
             recorridoArbol(this.Raiz, ref diccionario, binario);
@@ -85,23 +94,25 @@ namespace Laboratorio_Compresión
             return diccionario;
         }
 
-        private void recorridoArbol(Nodo nodo, ref Dictionary<char, List<bool>> diccionario, List<bool> binario)
+        private void recorridoArbol(Nodo nodo, ref Dictionary<char, string> diccionario, string binario)
         {
             //Agrega un 0 si se recorre hacia la izquierda y un 1 si se va hacia la derecha hasta llegar a la hoja que contiene el simbolo
 
             //Se toma la misma cadena de binario recorrida hasta ese momento para poseteriormente agregar los valore 1 o 0 al final
-            List<bool> listaIzquierda = binario;
-            List<bool> listaDerecha = binario;
+            string listaIzquierda = binario;
+            string listaDerecha = binario;
 
             if (!nodo.esHoja())
             {
 
                 //Recorrer nodos a la izquierda
-                listaIzquierda.Add(false);
+                //listaIzquierda.Add(false);
+                listaIzquierda += "0";
                 recorridoArbol(nodo.izquierdo, ref diccionario, listaIzquierda);
 
                 //Recorrer nodos a la derecha
-                listaDerecha.Add(true);
+                //listaDerecha.Add(true);
+                listaDerecha += "1";
                 recorridoArbol(nodo.derecho, ref diccionario, listaDerecha);
 
             }

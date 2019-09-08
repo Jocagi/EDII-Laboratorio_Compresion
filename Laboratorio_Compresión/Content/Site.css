@@ -1,4 +1,10 @@
-﻿body {
+﻿
+.navbar-inverse {
+    background-color: #3B83BD;
+    color: blue;
+}
+
+body {
     padding-top: 50px;
     padding-bottom: 20px;
 }

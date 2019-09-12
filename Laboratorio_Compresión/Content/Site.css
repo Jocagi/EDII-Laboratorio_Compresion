@@ -1,7 +1,25 @@
 ﻿
 .navbar-inverse {
     background-color: #3B83BD;
-    color: blue;
+    color: black !important;
+}
+
+.navbar-brand {
+    color: black !important;
+}
+
+.layoutBody {
+    background: white;
+    color: black !important;
+    font-family: 'Oswald', sans-serif;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+    color: #000 !important;
+}
+
+.navbar-inverse .navbar-brand {
+    color: #000 !important;
 }
 
 body {

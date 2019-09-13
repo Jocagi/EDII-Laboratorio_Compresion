@@ -13,16 +13,14 @@ namespace Laboratorio_Compresión.Controllers
     {
         //Lista de archivos comprimidos
         public static List<MisCompresiones> misCompresiones = new List<MisCompresiones>();
-        public static string directorioUploads;
-        public static string directorioHuffman;
-        public static string directorioHuffmanConfig;
+        public static string directorioUploads = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Uploads");
+        public static string directorioHuffman = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Huffman");
+        public static string directorioHuffmanConfig = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/HuffmanConfig");
+        public static string directorioHuffmanDecompress = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Decompression");
+        public static string mensaje = "";
 
         public ActionResult Index()
         {
-            directorioHuffman = Server.MapPath("~/Archivos/Huffman");
-            directorioUploads = Server.MapPath("~/Archivos/Uploads");
-            directorioHuffmanConfig = Server.MapPath("~/Archivos/HuffmanConfig");
-
             return View();
         }
 
@@ -44,7 +42,7 @@ namespace Laboratorio_Compresión.Controllers
                     file.SaveAs(path);
                     ViewBag.Message = "Carga Exitosa";
 
-                    Huffman.comprimir(path);
+                    Huffman.descomprimir(path);
                 }
                 catch (Exception ex)
                 {

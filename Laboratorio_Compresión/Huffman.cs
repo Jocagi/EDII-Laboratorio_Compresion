@@ -92,9 +92,10 @@ namespace Laboratorio_Compresión
 
                     if (Byte.Length == 8)
                     {
-                        //To Do... Escribir en archivo directamente
-                        //Agregar Ascii al comprimido
-                        textoComprimido += Encoding.ASCII.GetString(new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
+                            //Agregar Ascii al comprimido
+                                //textoComprimido += Encoding.UTF8.GetString(new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
+
+                        ByteArrayToFile(rutaComprimido, new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) }); //Escribir en archivo
                         Byte = "";
                     }
                 }
@@ -108,7 +109,8 @@ namespace Laboratorio_Compresión
                             Byte += "0";
                         }
 
-                        textoComprimido += Encoding.UTF8.GetString(new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
+                        //textoComprimido += Encoding.UTF8.GetString(new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
+                        ByteArrayToFile(rutaComprimido, new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
                         Byte = "";
                     }
 
@@ -116,7 +118,7 @@ namespace Laboratorio_Compresión
                 }
             }
 
-            System.IO.File.WriteAllText(rutaComprimido, textoComprimido); //Escribir en archivo
+                             //System.IO.File.WriteAllText(rutaComprimido, textoComprimido); //Escribir en archivo
 
             //Guardar configuracion para descomprimir
 
@@ -151,7 +153,38 @@ namespace Laboratorio_Compresión
 
         public static void descomprimir(string path)
         {
+            //Acceder a configuracion y recuperar diccionario
 
+            //Crear nuevo archivo en blanco
+
+            //Leer arreglos de bits y guardarlos en memoria principal
+
+            //Formatear bits
+
+            string yourByteString = Convert.ToString(byteArray[20], 2).PadLeft(8, '0'); // produces "00111111"
+
+
+            //Comparar con codiigos prefijo
+
+            //Al enccontrar una coincidencia escbribir el resultado en un archivo
+
+            //Repetir hasta leer todo el archivo
+
+        }
+
+        private static void ByteArrayToFile(string fileName, byte[] byteArray)
+        {
+            try
+            {
+                using (var fs = new FileStream(fileName, FileMode.Append, FileAccess.Write))
+                {
+                    fs.Write(byteArray, 0, byteArray.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Exception caught in process: {0}", ex);
+            }
         }
     }
 }

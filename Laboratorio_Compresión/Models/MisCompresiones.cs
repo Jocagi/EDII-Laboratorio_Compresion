@@ -5,36 +5,58 @@ using System.Web;
 using System.IO;
 using System.Text;
 
+using Laboratorio_Compresión.Controllers;
+
 namespace Laboratorio_Compresión.Models
 {
     public class MisCompresiones
     {
         public string nombreOriginal { get; set; }
-        public string razonDeCompresion { get; set; }
-        public string factorDeCompresion { get; set; }
-        public int porcentajeDeCompresion { get; set; }
+        public double razonDeCompresion { get; set; }
+        public double factorDeCompresion { get; set; }
+        public double porcentajeDeCompresion { get; set; }
 
         public MisCompresiones() { }
-        public MisCompresiones(string nombre, string razon, string factor, int porcentaje)
+        public MisCompresiones(string nombre, float razon, float factor, float porcentaje)
         {
             nombreOriginal = nombre;
             razonDeCompresion = razon;
             factorDeCompresion = factor;
             porcentajeDeCompresion = porcentaje;
         }
+        public MisCompresiones(string nombre, long pesoOriginal, long pesoComprimido)
+        {
+            nombreOriginal = nombre;
+            razonDeCompresion = calcularRazon(pesoOriginal, pesoComprimido);
+            factorDeCompresion = calcularFactor(pesoOriginal, pesoComprimido);
+            porcentajeDeCompresion = calcularPorcentaje(pesoOriginal, pesoComprimido);
+        }
 
-        //To Do... Calcular valores solicitados...
+        //Calcular valores solicitados...
+        private double calcularRazon(long pesoOriginal, long pesoComprimido)
+        {
+            return Convert.ToDouble(pesoComprimido) / Convert.ToDouble(pesoOriginal);
+        }
 
+        private double calcularFactor(long pesoOriginal, long pesoComprimido)
+        {
+            return Convert.ToDouble(pesoOriginal) / Convert.ToDouble( pesoComprimido);
+        }
+
+        private double calcularPorcentaje (long pesoOriginal, long pesoComprimido)
+        {
+            return 100 - ( (Convert.ToDouble(pesoComprimido) / Convert.ToDouble(pesoOriginal)) * 100 );
+        }
 
         public static void leerAchivos()
         {
             //Eliminar la lista en controlador
-            Controllers.HomeController.misCompresiones.Clear();
+            HomeController.misCompresiones.Clear();
 
             //Resumen: Se leen todos los archivos comprimidos crea la lista en el controlador
 
-            string carpetaArchivos = System.Web.HttpContext.Current.Server.MapPath("~/Laboratorio_Compresión/Archivos");
-            string carpetaHuff = System.Web.HttpContext.Current.Server.MapPath("~/Laboratorio_Compresión/Huffman");
+            string carpetaArchivos = HomeController.directorioUploads;
+            string carpetaHuff = HomeController.directorioHuffman;
 
             //Se enlistan todos los archivos en la carpeta de huffman, se leen y definen las propiedades
 
@@ -44,9 +66,15 @@ namespace Laboratorio_Compresión.Models
             DirectoryInfo infoHuff = new DirectoryInfo(carpetaHuff);
             FileInfo[] listaHuffman = infoHuff.GetFiles();
 
-            foreach (var archivo in listaHuffman)
+            foreach (var archivoComprimido in listaHuffman)
             {
-                //listaHuffman[0].Name
+                foreach (var archivoOriginal in listaArchivos)
+                {
+                    if (Path.GetFileNameWithoutExtension(archivoComprimido.FullName) == Path.GetFileNameWithoutExtension(archivoOriginal.FullName))
+                    {
+                        Controllers.HomeController.misCompresiones.Add(new MisCompresiones(archivoOriginal.Name, archivoOriginal.Length, archivoComprimido.Length) );
+                    }
+                }
             }
         }
     }

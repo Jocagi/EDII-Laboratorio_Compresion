@@ -56,6 +56,22 @@ namespace Laboratorio_Compresión.Controllers
             return View();
         }
 
+        public ActionResult ComprimirHuffman()
+        {
+            return View();
+        }
+
+        public ActionResult DescomprimirHuffman()
+        {
+            return View();
+        }
+
+        public ActionResult MisCompresiones()
+        {
+            Laboratorio_Compresión.Models.MisCompresiones.leerAchivos();
+            return View(misCompresiones);
+        }
+
         public ActionResult DownloadFile() //No se como sirve pero no tocar
         {
             string filename = "Poster.pdf";

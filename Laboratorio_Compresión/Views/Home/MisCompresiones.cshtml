@@ -1,0 +1,49 @@
+﻿@model IEnumerable<Laboratorio_Compresión.Models.MisCompresiones>
+
+@{
+    ViewBag.Title = "Mis Compresiones";
+}
+
+<h2>Mis Compresiones</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            Nombre Original
+        </th>
+        <th>
+            Razon de Compresión
+        </th>
+        <th>
+            Factor de Compresión
+        </th>
+        <th>
+            Porcentaje de Reducción
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.nombreOriginal)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.razonDeCompresion)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.factorDeCompresion)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.porcentajeDeCompresion) %
+        </td>
+        <td>
+            Descargar
+            @*@Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+            @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })*@
+        </td>
+    </tr>
+}
+
+</table>

@@ -17,7 +17,7 @@ namespace Laboratorio_Compresión.Models
         public double porcentajeDeCompresion { get; set; }
 
         public MisCompresiones() { }
-        public MisCompresiones(string nombre, float razon, float factor, float porcentaje)
+        public MisCompresiones(string nombre, double razon, double factor, double porcentaje)
         {
             nombreOriginal = nombre;
             razonDeCompresion = razon;
@@ -48,7 +48,7 @@ namespace Laboratorio_Compresión.Models
             return 100 - ( (Convert.ToDouble(pesoComprimido) / Convert.ToDouble(pesoOriginal)) * 100 );
         }
 
-        public static void leerAchivos()
+        private static void leerAchivos()
         {
             //Eliminar la lista en controlador
             HomeController.misCompresiones.Clear();
@@ -76,6 +76,57 @@ namespace Laboratorio_Compresión.Models
                     }
                 }
             }
+        }
+
+        public static void agregarNuevaCompresion(MisCompresiones nuevo)
+        {
+            string path = HomeController.archivoMisCompresiones;
+
+            using (StreamWriter sw = File.AppendText(path))
+            {
+                string text = string.Format("{0}, {1}, {2}, {3}", nuevo.nombreOriginal, nuevo.razonDeCompresion, nuevo.factorDeCompresion, nuevo.porcentajeDeCompresion);
+                sw.WriteLine(text);
+            }
+
+        }
+
+        public static List<MisCompresiones> leerLista()
+        {
+
+            string path = HomeController.archivoMisCompresiones;
+            List<MisCompresiones> lista = new List<MisCompresiones>();
+
+            if (!System.IO.File.Exists(path)) //No existe el archivo
+            {
+                File.Create(path);
+            }
+            else
+            {
+                using (var reader = new StreamReader(path))
+                {
+                    
+                    while (!reader.EndOfStream) //Recorrer archivo hasta el final
+                    {
+
+                        var line = reader.ReadLine();
+
+                        string[] datos = line.Split(','); //dividir datos
+
+                        try
+                        {
+                            lista.Add(new MisCompresiones(datos[0], Convert.ToDouble(datos[1]), Convert.ToDouble(datos[2]), Convert.ToDouble(datos[3])));
+                        }
+                        catch (Exception)
+                        {
+                            throw;
+                        }
+
+                    }
+                    reader.Close();
+                }
+            }
+
+            return lista;
         }
     }
 }

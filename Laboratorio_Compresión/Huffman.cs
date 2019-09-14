@@ -13,10 +13,12 @@ namespace Laboratorio_Compresión
 {
     public static class Huffman
     {
+        private static char EOF = '\u0003';
+
         public static void comprimir(string path)
         {
 
-            string Data = System.IO.File.ReadAllText(path); //To Do.. Sustituir por Bufffer
+            string Data = System.IO.File.ReadAllText(path); //Sustituir por ciclo buffer.
             List<char> Caracteres = Data.ToList<char>();
 
             Dictionary<char, int> dictionary = new Dictionary<char, int>();
@@ -35,6 +37,8 @@ namespace Laboratorio_Compresión
                     dictionary[item]++;
                 }
             }
+
+            dictionary.Add(EOF , 1); //End of file
             #endregion
 
             #region Codigos_Prefijo
@@ -85,9 +89,6 @@ namespace Laboratorio_Compresión
 
                     if (Byte.Length == 8)
                     {
-                            //Agregar Ascii al comprimido
-                                //textoComprimido += Encoding.UTF8.GetString(new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
-
                         ByteArrayToFile(rutaComprimido, new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) }); //Escribir en archivo
                         Byte = "";
                     }
@@ -102,7 +103,6 @@ namespace Laboratorio_Compresión
                             Byte += "0";
                         }
 
-                        //textoComprimido += Encoding.UTF8.GetString(new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
                         ByteArrayToFile(rutaComprimido, new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
                         Byte = "";
                     }
@@ -111,31 +111,17 @@ namespace Laboratorio_Compresión
                 }
             }
 
-                             //System.IO.File.WriteAllText(rutaComprimido, textoComprimido); //Escribir en archivo
-
             //Guardar configuracion para descomprimir
 
-            string nombreArchivoConfig = Path.GetFileNameWithoutExtension(path) + ".config";
-            string rutaConfig = Path.Combine(HomeController.directorioHuffmanConfig, nombreNuevoArchivo);
-
-            crearArchivo(rutaConfig);
-            
-            var csv = new StringBuilder();
-
-            string configuracion = string.Format("{0}", Path.GetFileName(path)); //Linea con informacion del archivo
-            csv.AppendLine(configuracion);
-
-            foreach (var item in diccionario)
-            {
-                //Lineas del diccionario
-                string newLine = string.Format("{0},{1}", item.Key, item.Value);
-                csv.AppendLine(newLine);
-            }
-            
-            //Escribir
-            System.IO.File.WriteAllText(rutaConfig, csv.ToString());
+            configuracionParaDescomprimir(path, diccionario);
 
             #endregion
+
+            HomeController.currentFile = rutaComprimido;
+
+            FileInfo originalFile = new FileInfo(path);
+            FileInfo compressedFile = new FileInfo(rutaComprimido);
+            MisCompresiones.agregarNuevaCompresion(new MisCompresiones(Path.GetFileName(path), originalFile.Length, compressedFile.Length)); //Anadir a mis compresiones
         }
 
         public static void descomprimir(string path)
@@ -143,34 +129,38 @@ namespace Laboratorio_Compresión
             string carpetaHuffConfig = HomeController.directorioHuffmanConfig;
             
             DirectoryInfo infoConfig = new DirectoryInfo(carpetaHuffConfig);
+
             FileInfo[] listaHuffman = infoConfig.GetFiles();
 
-            bool success = false;
-
+            string rutaCaracteres = "";
+            string rutaConfig = "";
+            
             foreach (var archivo in listaHuffman)
             {
                 if (Path.GetFileNameWithoutExtension(archivo.FullName) == Path.GetFileNameWithoutExtension(path))
                 {
-                    success = !success;
-                    descomprimir(path, archivo.FullName);
-                    break;
+                    if (archivo.Extension == ".config")
+                    {
+                        rutaConfig = archivo.FullName;
+                    }
+                    if (archivo.Extension == ".char")
+                    {
+                        rutaCaracteres = archivo.FullName;
+                    }
                 }
             }
-
-            if (!success)
-            {
-                HomeController.mensaje = "No es posible descomprimir el archivo debido a que no se han encontrado los codigos prefijo";
-            }
+            
+            descomprimir(path, rutaConfig, rutaCaracteres);
         }
 
-        private static void descomprimir(string path, string pathConfig)
+        private static void descomprimir(string path, string pathConfig, string pathCharacters)
         {
             string rutaDescomprimido = HomeController.directorioHuffmanDecompress;
             string nombreArchivo = "";
 
             //Acceder a configuracion y recuperar diccionario
 
-            Dictionary<string, char> codigosPrefijo = leerArchivoConfiguracion(pathConfig, ref nombreArchivo);
+            Dictionary<string, char> codigosPrefijo = leerArchivoConfiguracion(pathConfig, pathCharacters, ref nombreArchivo);
             rutaDescomprimido += "/" + nombreArchivo;
             
             //Crear nuevo archivo en blanco
@@ -205,71 +195,33 @@ namespace Laboratorio_Compresión
 
                 //Al encontrar una coincidencia escbribir el resultado en un archivo
 
+                bool continuar = true;
+
                 foreach (var value in found)
                 {
-                    bits = bits.Remove(0, value.Length); //Remover cadena de bits encontrada
-                    escribirEnArchivo(rutaDescomprimido, codigosPrefijo[value].ToString()); //Escribir
+                    if (value != EOF.ToString()) //End of file
+                    {
+                        bits = bits.Remove(0, value.Length); //Remover cadena de bits encontrada
+                        escribirEnArchivo(rutaDescomprimido, codigosPrefijo[value].ToString()); //Escribir
+                    }
+                    else
+                    {
+                        continuar = false;
+                        break;
+                    }
+                }
+
+                if (!continuar) //Si se ha encontrado el EOF no seguir
+                {
+                    break;
                 }
             }
 
             //Repetir hasta leer todo el archivo
+
+            HomeController.currentFile = rutaDescomprimido;
         }
-
-        private static Dictionary<string, char> leerArchivoConfiguracion(string path, ref string nombreArchivo)
-        {
-
-            Dictionary<string, char> configuracion = new Dictionary<string, char>();
-
-            if (!System.IO.File.Exists(path)) //No existe el archivo
-            {
-                throw new Exception("No existe el archivo");
-            }
-            else
-            {
-                using (var reader = new StreamReader(path))
-                {
-                    /*
-                    Formato:
-
-                    char, codigo
-                    a, 101
-
-                     */
-
-                    bool firstline = true;
-
-                    while (!reader.EndOfStream) //Recorrer archivo hasta el final
-                    {
-
-                        var line = reader.ReadLine();
-
-                        if (firstline)
-                        {
-                            nombreArchivo = line;
-                            firstline = false;
-                        }
-                        else
-                        {
-                            string[] datos = line.Split(','); //dividir datos
-
-                            try
-                            {
-                                configuracion.Add(datos[1], Convert.ToChar(datos[0])); 
-                            }
-                            catch (Exception)
-                            {
-                                throw;
-                            }
-                        }
-                    }
-                    reader.Close();
-                }
-            }
-
-            return configuracion;
-
-        }
-
+        
         private static void ByteArrayToFile(string fileName, byte[] byteArray)
         {
             try
@@ -313,5 +265,84 @@ namespace Laboratorio_Compresión
             }
             
         }
+
+        private static void configuracionParaDescomprimir(string path, Dictionary<char, string> diccionario)
+        {
+
+            string nombreArchivo = Path.GetFileNameWithoutExtension(path);
+
+            string rutaCharacters = Path.Combine(HomeController.directorioHuffmanConfig, nombreArchivo + ".char");
+            string rutaPrefijos = Path.Combine(HomeController.directorioHuffmanConfig, nombreArchivo + ".config");
+            
+            crearArchivo(rutaCharacters);
+            crearArchivo(rutaPrefijos);
+
+            var csv = new StringBuilder();
+            string configuracion = string.Format("{0}", Path.GetFileName(path)); //Linea con informacion del archivo
+            csv.AppendLine(configuracion);
+
+            foreach (var item in diccionario)
+            {
+                ByteArrayToFile(rutaCharacters, new byte[] { Convert.ToByte(item.Key) }); //Escribir en archivo
+                csv.AppendLine(item.Value);
+            }
+            
+            //Escribir
+            System.IO.File.WriteAllText(rutaPrefijos, csv.ToString());
+
+        }
+
+        private static Dictionary<string, char> leerArchivoConfiguracion(string pathConfig, string pathCharacters,  ref string nombreArchivo)
+        {
+
+            Dictionary<string, char> configuracion = new Dictionary<string, char>();
+
+            if (!System.IO.File.Exists(pathConfig))
+            {
+                throw new Exception("No existe el archivo");
+            }
+            else if (!System.IO.File.Exists(pathCharacters))
+            {
+                throw new Exception("No existe el archivo");
+            }
+            else
+            {
+                byte[] bytes = System.IO.File.ReadAllBytes(pathCharacters);
+                int i = 0;
+
+                using (var reader = new StreamReader(pathConfig))
+                {
+                    bool firstline = true;
+                    
+                    while (!reader.EndOfStream) 
+                    {
+                        var line = reader.ReadLine();
+
+                        if (firstline)
+                        {
+                            nombreArchivo = line;
+                            firstline = false;
+                        }
+                        else
+                        {
+                            try
+                            {
+                                configuracion.Add(line, Convert.ToChar(bytes[i]));
+                                i++;
+                            }
+                            catch (Exception)
+                            {
+                                throw;
+                            }
+                        }
+                    }
+                    reader.Close();
+                }
+            }
+
+            return configuracion;
+
+        }
+
     }
 }

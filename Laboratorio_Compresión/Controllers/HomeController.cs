@@ -17,8 +17,10 @@ namespace Laboratorio_Compresión.Controllers
         public static string directorioHuffman = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Huffman");
         public static string directorioHuffmanConfig = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/HuffmanConfig");
         public static string directorioHuffmanDecompress = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Decompression");
+        public static string archivoMisCompresiones = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Mis_Compresiones/Lista.txt");
         public static string mensaje = "";
-
+        public static string currentFile = "";
+        
         public ActionResult Index()
         {
             return View();
@@ -60,34 +62,98 @@ namespace Laboratorio_Compresión.Controllers
         {
             return View();
         }
+        [HttpPost]
+        public ActionResult ComprimirHuffman(HttpPostedFileBase file)
+        {
+            string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
+
+            try
+            {
+                UploadFile(path, file);
+                Huffman.comprimir(path);
+    }
+            catch (Exception ex)
+            {
+                ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                throw;
+            }
+
+            return RedirectToAction("Index");
+        }
 
         public ActionResult DescomprimirHuffman()
         {
             return View();
         }
+        [HttpPost]
+        public ActionResult DescomprimirHuffman(HttpPostedFileBase file)
+        {
+            string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
+
+            try
+            {
+                UploadFile(path, file);
+                Huffman.descomprimir(path);
+
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                throw;
+            }
+
+            return RedirectToAction("Index");
+        }
 
         public ActionResult MisCompresiones()
         {
-            Laboratorio_Compresión.Models.MisCompresiones.leerAchivos();
+            misCompresiones = Models.MisCompresiones.leerLista();
             return View(misCompresiones);
         }
 
-        public ActionResult DownloadFile() //No se como sirve pero no tocar
+        public ActionResult DownloadFile() 
         {
-            string filename = "Poster.pdf";
-            string filepath = Server.MapPath("~/Archivos/") +  filename;
-            byte[] filedata = System.IO.File.ReadAllBytes(filepath);
-            string contentType = MimeMapping.GetMimeMapping(filepath);
+            string path = currentFile;
+            byte[] filedata = System.IO.File.ReadAllBytes(path);
+            string contentType = MimeMapping.GetMimeMapping(path);
 
             var cd = new System.Net.Mime.ContentDisposition
             {
-                FileName = filename,
+                FileName = Path.GetFileName(path),
                 Inline = true,
             };
 
             Response.AppendHeader("Content-Disposition", cd.ToString());
 
+            currentFile = "";
+
             return File(filedata, contentType);
+        }
+
+        public void UploadFile(string path, HttpPostedFileBase file)
+        {
+            //Subir archivos al servidor
+
+            if (file != null && file.ContentLength > 0)
+                try
+                {
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+
+                    file.SaveAs(path);
+                    ViewBag.Message = "Carga Exitosa";
+
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                }
+            else
+            {
+                ViewBag.Message = "No ha especificado un archivo.";
+            }
         }
         
     }

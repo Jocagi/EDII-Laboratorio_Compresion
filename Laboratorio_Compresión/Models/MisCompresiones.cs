@@ -35,17 +35,17 @@ namespace Laboratorio_Compresión.Models
         //Calcular valores solicitados...
         private double calcularRazon(long pesoOriginal, long pesoComprimido)
         {
-            return Convert.ToDouble(pesoComprimido) / Convert.ToDouble(pesoOriginal);
+            return Math.Round(Convert.ToDouble(pesoComprimido) / Convert.ToDouble(pesoOriginal), 2);
         }
 
         private double calcularFactor(long pesoOriginal, long pesoComprimido)
         {
-            return Convert.ToDouble(pesoOriginal) / Convert.ToDouble( pesoComprimido);
+            return Math.Round( Convert.ToDouble(pesoOriginal) / Convert.ToDouble(pesoComprimido) , 2);
         }
 
         private double calcularPorcentaje (long pesoOriginal, long pesoComprimido)
         {
-            return 100 - ( (Convert.ToDouble(pesoComprimido) / Convert.ToDouble(pesoOriginal)) * 100 );
+            return Math.Round(100 - ( (Convert.ToDouble(pesoComprimido) / Convert.ToDouble(pesoOriginal)) * 100 ), 2);
         }
 
         private static void leerAchivos()
@@ -94,7 +94,8 @@ namespace Laboratorio_Compresión.Models
         {
 
             string path = HomeController.archivoMisCompresiones;
-            List<MisCompresiones> lista = new List<MisCompresiones>();
+
+            Stack<MisCompresiones> lista = new Stack<MisCompresiones>();
 
             if (!System.IO.File.Exists(path)) //No existe el archivo
             {
@@ -114,7 +115,7 @@ namespace Laboratorio_Compresión.Models
 
                         try
                         {
-                            lista.Add(new MisCompresiones(datos[0], Convert.ToDouble(datos[1]), Convert.ToDouble(datos[2]), Convert.ToDouble(datos[3])));
+                            lista.Push(new MisCompresiones(datos[0], Convert.ToDouble(datos[1]), Convert.ToDouble(datos[2]), Convert.ToDouble(datos[3])));
                         }
                         catch (Exception)
                         {
@@ -126,7 +127,7 @@ namespace Laboratorio_Compresión.Models
                 }
             }
 
-            return lista;
+            return lista.ToList();
         }
     }
 }

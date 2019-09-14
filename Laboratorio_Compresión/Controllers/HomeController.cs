@@ -65,10 +65,10 @@ namespace Laboratorio_Compresión.Controllers
         [HttpPost]
         public ActionResult ComprimirHuffman(HttpPostedFileBase file)
         {
-            string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
-
             try
             {
+                string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
+
                 UploadFile(path, file);
                 Huffman.comprimir(path);
     }
@@ -88,10 +88,11 @@ namespace Laboratorio_Compresión.Controllers
         [HttpPost]
         public ActionResult DescomprimirHuffman(HttpPostedFileBase file)
         {
-            string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
-
+            
             try
             {
+                string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
+
                 UploadFile(path, file);
                 Huffman.descomprimir(path);
 

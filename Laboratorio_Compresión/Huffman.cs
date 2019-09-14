@@ -18,7 +18,7 @@ namespace Laboratorio_Compresión
         public static void comprimir(string path)
         {
 
-            string Data = System.IO.File.ReadAllText(path); //Sustituir por ciclo buffer.
+            string Data = System.IO.File.ReadAllText(path, Encoding.Default); //Sustituir por ciclo buffer.
             List<char> Caracteres = Data.ToList<char>();
 
             Dictionary<char, int> dictionary = new Dictionary<char, int>();
@@ -38,7 +38,7 @@ namespace Laboratorio_Compresión
                 }
             }
 
-            dictionary.Add(EOF , 1); //End of file
+            dictionary.Add(EOF, 1); //End of file
             #endregion
 
             #region Codigos_Prefijo
@@ -48,7 +48,7 @@ namespace Laboratorio_Compresión
 
             //Leer archivo original y sustituir por codigos prefijo
 
-            string Data1 = System.IO.File.ReadAllText(path); //To Do.. Sustituir por Bufffer 
+            string Data1 = System.IO.File.ReadAllText(path, Encoding.Default); //To Do.. Sustituir por Bufffer 
             string textoBinario = "";
 
 
@@ -64,6 +64,8 @@ namespace Laboratorio_Compresión
                 }
             }
 
+            textoBinario += diccionario[EOF]; //End of file
+
             #endregion
 
             #region Escritura
@@ -78,7 +80,7 @@ namespace Laboratorio_Compresión
             string Byte = ""; //Valor de 8 bits 
             List<char> binario = textoBinario.ToArray().ToList(); //Arreglo de texto en binario
             bool completed = false;
-
+            
             while (!completed)
             {
                 if (binario.Count > 0)
@@ -199,7 +201,7 @@ namespace Laboratorio_Compresión
 
                 foreach (var value in found)
                 {
-                    if (value != EOF.ToString()) //End of file
+                    if (codigosPrefijo[value] != EOF) //End of file
                     {
                         bits = bits.Remove(0, value.Length); //Remover cadena de bits encontrada
                         escribirEnArchivo(rutaDescomprimido, codigosPrefijo[value].ToString()); //Escribir
@@ -252,11 +254,6 @@ namespace Laboratorio_Compresión
         {
             if (File.Exists(path))
             {
-                //using (StreamWriter sw = File.AppendText(path))
-                //{
-                //    sw.WriteLine(text);
-                //}
-
                 File.AppendAllText(path, text);
             }
             else

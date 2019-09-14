@@ -158,3 +158,4 @@ C:\Users\user\Desktop\Laboratorio_Compresión\Laboratorio_Compresion\Laboratorio
 C:\Users\user\Desktop\Laboratorio_Compresión\Laboratorio_Compresion\Laboratorio_Compresión\obj\Debug\Laboratorio_Compresión.csproj.CopyComplete
 C:\Users\user\Desktop\Laboratorio_Compresión\Laboratorio_Compresion\Laboratorio_Compresión\obj\Debug\Laboratorio_Compresión.dll
 C:\Users\user\Desktop\Laboratorio_Compresión\Laboratorio_Compresion\Laboratorio_Compresión\obj\Debug\Laboratorio_Compresión.pdb
+

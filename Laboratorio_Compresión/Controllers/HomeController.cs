@@ -11,6 +11,7 @@ namespace Laboratorio_Compresión.Controllers
 {
     public class HomeController : Controller
     {
+
         //Lista de archivos comprimidos
         public static List<MisCompresiones> misCompresiones = new List<MisCompresiones>();
         public static string directorioUploads = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Uploads");
@@ -25,53 +26,21 @@ namespace Laboratorio_Compresión.Controllers
         {
             return View();
         }
-
-        [HttpPost]
-        public ActionResult Index(HttpPostedFileBase file)
-        {
-            //Subir archivos al servidor
-
-            if (file != null && file.ContentLength > 0)
-                try
-                {
-                    string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
-
-                    if (System.IO.File.Exists(path))
-                    {
-                        System.IO.File.Delete(path);
-                    }
-
-                    file.SaveAs(path);
-                    ViewBag.Message = "Carga Exitosa";
-
-                    Huffman.descomprimir(path);
-                }
-                catch (Exception ex)
-                {
-                    ViewBag.Message = "ERROR:" + ex.Message.ToString();
-                }
-            else
-            {
-                ViewBag.Message = "No ha especificado un archivo.";
-            }
-
-            return View();
-        }
-
+      
+        
         public ActionResult ComprimirHuffman()
         {
             return View();
         }
         [HttpPost]
-        public ActionResult ComprimirHuffman(HttpPostedFileBase file)
-        {
+        public ActionResult ComprimirHuffman(HttpPostedFileBase file) {
             try
             {
                 string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
 
                 UploadFile(path, file);
                 Huffman.comprimir(path);
-    }
+            }
             catch (Exception ex)
             {
                 ViewBag.Message = "ERROR:" + ex.Message.ToString();
@@ -156,6 +125,5 @@ namespace Laboratorio_Compresión.Controllers
                 ViewBag.Message = "No ha especificado un archivo.";
             }
         }
-        
     }
 }

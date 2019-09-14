@@ -135,6 +135,8 @@
     <Compile Include="Huffman.cs" />
     <Compile Include="Models\MisCompresiones.cs" />
     <Compile Include="Nodo.cs" />
+    <Compile Include="Lectura.cs" />
+    <Compile Include="Models\Archivo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -179,6 +181,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Content Include="Views\IngresoArchivo.cshtml" />
+    <Content Include="Views\Archivo.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="App_Data\" />
+    <Folder Include="Uploads\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

@@ -117,7 +117,7 @@ namespace Laboratorio_Compresión.Controllers
                         buffer = reader.ReadBytes(bufferLength);
                         foreach (var item in buffer)
                         {
-                            tata.Add;
+                            tata.Add((char)item);
                         }
                     }
                 }

@@ -36,8 +36,9 @@ namespace Laboratorio_Compresión.Controllers
                 string extension = Path.GetExtension(archivo.FileName);
                 archivo.SaveAs(filePath);
                 string text = filePath;
-                WriteFile(text);
-                readfile();
+                
+               // WriteFile(text);
+               // readfile();
 
                 string csvData = System.IO.File.ReadAllText(filePath);
                 List<char> Caracteres = csvData.ToList<char>();
@@ -85,6 +86,45 @@ namespace Laboratorio_Compresión.Controllers
             }
             return View(Caracteres);
         }
+        class ByteGenerator
+        {
+            public static byte[] ConvertToBytes(string text)
+            {
+                return Encoding.ASCII.GetBytes(text);
+            }
+            public static string ConvertToString(byte[] bytes)
+            {
+                return Encoding.ASCII.GetString(bytes);
+            }
+            public static byte[] ConvertToBytes(char[] text)
+            {
+                return Encoding.ASCII.GetBytes(text);
+            }
+        }
+      
+        public void leer(string text, string path)
+        {
+            List<char> tata = new List<char>();
+            int txt = Convert.ToInt32(text);
+            int bufferLength = txt;
+            var buffer = new byte[bufferLength];
+            using (var file = new FileStream(path))
+            {
+                using (var reader = new BinaryReader(file))
+                {
+                    while (reader.BaseStream.Position != reader.BaseStream.Position)
+                    {
+                        buffer = reader.ReadBytes(bufferLength);
+                        foreach (var item in buffer)
+                        {
+                            tata.Add;
+                        }
+                    }
+                }
+            }
+        }
+        #region buffer prueba
+        /*
         static void WriteFile(string text)
         {
             var dir = Directory.GetCurrentDirectory();
@@ -100,13 +140,14 @@ namespace Laboratorio_Compresión.Controllers
                     fs.Write(buffer, 0, buffer.Length);
                 }
                 fs.Flush();
-                fs.Close();
+                fs.Close();  
             }
             catch (Exception ex)
             {
                 WriteLine(Environment.NewLine + ex.Message);
             }
         }
+       
         static void readfile()
         {
             var dir = Directory.GetCurrentDirectory();
@@ -117,7 +158,7 @@ namespace Laboratorio_Compresión.Controllers
             {
                 FileStream fs = new FileStream(file, FileMode.Open, FileAccess.Read);
                 byte[] buffer = new byte[1024];
-                int bytesread = fs.Read(buffer, 0, buffer.Length);
+                int bytesread = fs.Read(buffer, 0, buffer.Length);              
 
                 text = Encoding.ASCII.GetString(buffer, 0, bytesread);
 
@@ -132,7 +173,9 @@ namespace Laboratorio_Compresión.Controllers
 
             WriteLine();
             WriteLine("El texto es: " + Environment.NewLine + text);
-        }
+        }*/
+
+        #endregion
         public ActionResult contar()
         {
             char carac;

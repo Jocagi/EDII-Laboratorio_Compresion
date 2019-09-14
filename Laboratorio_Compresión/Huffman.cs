@@ -18,25 +18,10 @@ namespace Laboratorio_Compresión
         public static void comprimir(string path)
         {
 
-            string Data = System.IO.File.ReadAllText(path, Encoding.Default); //Sustituir por ciclo buffer.
-            List<char> Caracteres = Data.ToList<char>();
-
-            Dictionary<char, int> dictionary = new Dictionary<char, int>();
-
             #region Caracteres
             //Leer caracteres y contarlos
 
-            foreach (var item in Caracteres)
-            {
-                if (!dictionary.Keys.Contains(item))
-                {
-                    dictionary.Add(item, 1);
-                }
-                else
-                {
-                    dictionary[item]++;
-                }
-            }
+            Dictionary<char, int> dictionary = Lectura.obtenerDiccionarioFrecuencias(12, path);
 
             dictionary.Add(EOF, 1); //End of file
             #endregion
@@ -48,22 +33,7 @@ namespace Laboratorio_Compresión
 
             //Leer archivo original y sustituir por codigos prefijo
 
-            string Data1 = System.IO.File.ReadAllText(path, Encoding.Default); //To Do.. Sustituir por Bufffer 
-            string textoBinario = "";
-
-
-            foreach (char caracter in Data1)
-            {
-                if (diccionario.ContainsKey(caracter))
-                {
-                    textoBinario += diccionario[caracter];
-                }
-                else
-                {
-                    throw new Exception("El diccionario no contiene el valor especificado");
-                }
-            }
-
+            string textoBinario = Lectura.textoBinario(12, path, diccionario);
             textoBinario += diccionario[EOF]; //End of file
 
             #endregion
@@ -171,54 +141,57 @@ namespace Laboratorio_Compresión
 
             //Leer arreglos de bits y guardarlos en memoria principal
 
-            byte[] bytes = System.IO.File.ReadAllBytes(path); //To Do.. Sustituir por Bufffer
             string bits = "";
             
-            foreach (var item in bytes)
+            int bufferLength = 12;
+            var buffer = new byte[bufferLength];
+
+            using (var file = new FileStream(path, FileMode.Open))
             {
-                //Formatear bits
-                string ByteString = Convert.ToString(item, 2).PadLeft(8, '0'); // produce cadena "00111111"
-                bits += ByteString;
-
-                //Comparar con codigos prefijo
-                string tmp = "";
-                List<string> found = new List<string>();
-
-                foreach (var numero in bits)
+                using (var reader = new BinaryReader(file))
                 {
-                    tmp += numero;
-
-                    if (codigosPrefijo.ContainsKey(tmp))
+                    while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
-                        found.Add(tmp);
-                        tmp = "";
+                        buffer = reader.ReadBytes(bufferLength);
+                        foreach (var item in buffer)
+                        {
+                            string tmp = "";
+
+                            //Formatear bits
+                            string ByteString = Convert.ToString(item, 2).PadLeft(8, '0'); // produce cadena "00111111"
+                            bits += ByteString;
+
+                            //Comparar con codigos prefijo
+                            bool continuar = true;
+
+                            foreach (var numero in bits)
+                            {
+                                tmp += numero;
+
+                                if (codigosPrefijo.ContainsKey(tmp)) //Al encontrar una coincidencia escbribir el resultado en un archivo
+                                {
+                                    if (codigosPrefijo[tmp] != EOF)
+                                    {
+                                        bits = bits.Remove(0, tmp.Length); //Remover cadena de bits encontrada
+                                        ByteArrayToFile(rutaDescomprimido, new byte[] { Convert.ToByte(Convert.ToInt32(codigosPrefijo[tmp])) });
+                                        tmp = "";
+                                    }
+                                    else
+                                    {
+                                        continuar = false;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (!continuar) //Si se ha encontrado el EOF no seguir
+                            {
+                                break;
+                            }
+                        }
                     }
-                }
-
-                //Al encontrar una coincidencia escbribir el resultado en un archivo
-
-                bool continuar = true;
-
-                foreach (var value in found)
-                {
-                    if (codigosPrefijo[value] != EOF) //End of file
-                    {
-                        bits = bits.Remove(0, value.Length); //Remover cadena de bits encontrada
-                        escribirEnArchivo(rutaDescomprimido, codigosPrefijo[value].ToString()); //Escribir
-                    }
-                    else
-                    {
-                        continuar = false;
-                        break;
-                    }
-                }
-
-                if (!continuar) //Si se ha encontrado el EOF no seguir
-                {
-                    break;
                 }
             }
-
             //Repetir hasta leer todo el archivo
 
             HomeController.currentFile = rutaDescomprimido;

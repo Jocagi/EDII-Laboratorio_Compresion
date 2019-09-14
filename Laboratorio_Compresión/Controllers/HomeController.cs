@@ -108,11 +108,11 @@ namespace Laboratorio_Compresión.Controllers
             int txt = Convert.ToInt32(text);
             int bufferLength = txt;
             var buffer = new byte[bufferLength];
-            using (var file = new FileStream(path))
+            using (var file = new FileStream(path, FileMode.Open))
             {
                 using (var reader = new BinaryReader(file))
                 {
-                    while (reader.BaseStream.Position != reader.BaseStream.Position)
+                    while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
                         buffer = reader.ReadBytes(bufferLength);
                         foreach (var item in buffer)
@@ -124,6 +124,25 @@ namespace Laboratorio_Compresión.Controllers
             }
         }
         #region buffer prueba
+        public static void Escritura(string text, string path)
+        {
+            List<char> tata = new List<char>();
+            int txt = Convert.ToInt32(text);
+            int bufferLength = txt;
+            var buffer = new byte[bufferLength];
+            using (var file = new FileStream(path, FileMode.Create))
+            {
+                using (var writer = new BinaryWriter(file))
+                {
+                    for(int i = 0; i<buffer.Length; i++)
+                    {
+                        buffer[i] = Convert.ToByte(100 + i);
+                    }
+                    writer.Write(buffer);
+                }
+            }
+
+        }
         /*
         static void WriteFile(string text)
         {

@@ -1,0 +1,21 @@
+﻿
+@{
+    ViewBag.Title = "Comprimir Huffman";
+}
+
+<h2>Comprimir Huffman</h2>
+
+<div class="jumbotron">
+    <h3>Subir archivo a comprimir</h3>
+</div>
+
+@using (Html.BeginForm("ComprimirHuffman", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <label for="file">Subir archivo:</label>
+    <input type="file" name="file" id="file" /><br><br>
+    <input type="submit" value="Upload File" />
+    <br><br>
+    @ViewBag.Message
+}
+
+

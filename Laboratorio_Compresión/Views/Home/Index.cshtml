@@ -3,22 +3,20 @@
 }
 
 <div class="jumbotron">
-    <h3>Subir archivo a comprimir</h3>
+    <h3>Laboratorio No. 1</h3>
 </div>
 
-@using (Html.BeginForm("Index", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+
+
+@if (Laboratorio_Compresión.Controllers.HomeController.currentFile != "")
 {
-    <input type="file" name="archivo"/>
-    <input type="submit" value="Importar"/>
-    //<label for="file">Upload Image:</label>
-   //<input type="file" name="file" id="file" /><br><br>
-    //<input type="submit" value="Upload File" />
-    <br><br>
-    @ViewBag.Message
+    <div>
+        < input type = "button" value = "Download"
+        onclick = "location.href= '@Url.Action("DownloadFile", "Home")'" %>
+    </div>
 }
 
-
-@*Encoding type is multipart/form-data. These parameters are required for uploading binary data to the server.
-    The name of the input element identifies the uploaded file in the HttpPostedFilesBase object.
-*@
-
+else
+{
+    <b>Bienvenidos a Compresiones Huffman!</b>
+}

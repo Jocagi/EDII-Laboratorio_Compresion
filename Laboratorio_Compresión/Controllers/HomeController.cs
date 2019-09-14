@@ -6,108 +6,124 @@ using System.Web;
 using System.Web.Mvc;
 using Laboratorio_Compresión.Models;
 using System.Text;
-using static System.Console;
 
 namespace Laboratorio_Compresión.Controllers
 {
     public class HomeController : Controller
     {
-        List<Archivo> Frecuencias = new List<Archivo>();
-        List<char> Caracteres = new List<char>();
-        //GET: Archivo
+
+        //Lista de archivos comprimidos
+        public static List<MisCompresiones> misCompresiones = new List<MisCompresiones>();
+        public static string directorioUploads = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Uploads");
+        public static string directorioHuffman = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Huffman");
+        public static string directorioHuffmanConfig = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/HuffmanConfig");
+        public static string directorioHuffmanDecompress = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Decompression");
+        public static string archivoMisCompresiones = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Mis_Compresiones/Lista.txt");
+        public static string mensaje = "";
+        public static string currentFile = "";
+        
         public ActionResult Index()
         {
-            return View(new List<char>());
-        }
-
-        [HttpPost]
-        public ActionResult Index(HttpPostedFileBase archivo)
-        {
-          
-            string filePath = string.Empty;
-            if (archivo != null)
-            {
-                string path = Server.MapPath("~/Uploads/");
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                filePath = path + Path.GetFileName(archivo.FileName);
-                string extension = Path.GetExtension(archivo.FileName);
-                archivo.SaveAs(filePath);
-                string text = filePath;
-
-                string csvData = System.IO.File.ReadAllText(filePath);
-                List<char> Caracteres = csvData.ToList<char>();
-                #region uno
-                // char[] caracter = csvData.ToList<char>();
-                // foreach(char item in caracter)
-                // {
-                //     Caracteres.Add(item);
-                // }
-
-                /* var result = from item in csvData.ToArray()
-                              group item by item into c
-                              select new
-                              {
-                                  carac = c.Key,
-                                  repeticiones = c.Count()
-                              };*/
-
-                /*  foreach(string row in csvData.Split('\n'))
-                  {
-                      if(!string.IsNullOrEmpty(row))
-                      {
-
-                          Frecuencias.Add(new Archivo
-                          {
-
-                          });
-                      }
-                  }*/
-                #endregion
-                Dictionary<char, int> didid = new Dictionary<char, int>();
-                foreach (var item in Caracteres)
-                {
-                    if (!didid.Keys.Contains(item))
-                    {
-                        didid.Add(item, 1);
-                    }
-                    else
-                    {
-                        didid[item]++;
-                    }
-                }
-                int v = 0;
-
-            }
-            return View(Caracteres);
+            return View();
         }
       
-        public ActionResult contar()
+        
+        public ActionResult ComprimirHuffman()
         {
-            char carac;
-            foreach (var item in Caracteres.GroupBy(x => x))
-                carac = item.Key;
-
-
             return View();
         }
- 
-        public ActionResult About()
-        {
-            ViewBag.Message = "Your application description page.";
+        [HttpPost]
+        public ActionResult ComprimirHuffman(HttpPostedFileBase file) {
+            try
+            {
+                string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
 
-            return View();
+                UploadFile(path, file);
+                Huffman.comprimir(path);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                throw;
+            }
+
+            return RedirectToAction("Index");
         }
 
-        public ActionResult Contact()
+        public ActionResult DescomprimirHuffman()
         {
-            ViewBag.Message = "Your contact page.";
-
             return View();
         }
+        [HttpPost]
+        public ActionResult DescomprimirHuffman(HttpPostedFileBase file)
+        {
+            
+            try
+            {
+                string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
 
+                UploadFile(path, file);
+                Huffman.descomprimir(path);
 
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                throw;
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult MisCompresiones()
+        {
+            misCompresiones = Models.MisCompresiones.leerLista();
+            return View(misCompresiones);
+        }
+
+        public ActionResult DownloadFile() 
+        {
+            string path = currentFile;
+            byte[] filedata = System.IO.File.ReadAllBytes(path);
+            string contentType = MimeMapping.GetMimeMapping(path);
+
+            var cd = new System.Net.Mime.ContentDisposition
+            {
+                FileName = Path.GetFileName(path),
+                Inline = true,
+            };
+
+            Response.AppendHeader("Content-Disposition", cd.ToString());
+
+            currentFile = "";
+
+            return File(filedata, contentType);
+        }
+
+        public void UploadFile(string path, HttpPostedFileBase file)
+        {
+            //Subir archivos al servidor
+
+            if (file != null && file.ContentLength > 0)
+                try
+                {
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+
+                    file.SaveAs(path);
+                    ViewBag.Message = "Carga Exitosa";
+
+                }
+                catch (Exception ex)
+                {
+                    ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                }
+            else
+            {
+                ViewBag.Message = "No ha especificado un archivo.";
+            }
+        }
     }
 }

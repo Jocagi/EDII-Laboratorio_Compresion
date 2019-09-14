@@ -84,6 +84,8 @@ namespace Laboratorio_Compresión.Controllers
         public ActionResult DownloadFile() 
         {
             string path = currentFile;
+            string fileName = Path.GetFileName(path);
+
             byte[] filedata = System.IO.File.ReadAllBytes(path);
             string contentType = MimeMapping.GetMimeMapping(path);
 
@@ -93,10 +95,9 @@ namespace Laboratorio_Compresión.Controllers
                 Inline = true,
             };
 
-            Response.AppendHeader("Content-Disposition", cd.ToString());
-
             currentFile = "";
 
+            Response.AppendHeader("Content-Disposition", cd.ToString());
             return File(filedata, contentType);
         }
 

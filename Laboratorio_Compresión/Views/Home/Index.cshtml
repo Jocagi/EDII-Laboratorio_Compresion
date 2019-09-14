@@ -6,16 +6,13 @@
     <h3>Laboratorio No. 1</h3>
 </div>
 
-
-
 @if (Laboratorio_Compresión.Controllers.HomeController.currentFile != "")
 {
     <div>
-        < input type = "button" value = "Download"
+        <input type = "button" value = "Download"
         onclick = "location.href= '@Url.Action("DownloadFile", "Home")'" %>
     </div>
 }
-
 else
 {
     <b>Bienvenidos a Compresiones Huffman!</b>

@@ -133,6 +133,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Huffman.cs" />
+    <Compile Include="LZW.cs" />
     <Compile Include="Models\MisCompresiones.cs" />
     <Compile Include="Nodo.cs" />
     <Compile Include="Lectura.cs" />
@@ -176,6 +177,8 @@
     <Content Include="Views\Home\MisCompresiones.cshtml" />
     <Content Include="Views\Home\ComprimirHuffman.cshtml" />
     <Content Include="Views\Home\DescomprimirHuffman.cshtml" />
+    <Content Include="Views\Home\ComprimirLZW.cshtml" />
+    <Content Include="Views\Home\DescomprimirLZW.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\IngresoArchivo.cshtml" />

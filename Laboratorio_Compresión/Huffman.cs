@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Laboratorio_Compresión.Models;
 using System.Text;
 using System.IO;
 
-using System.Web.Mvc;
 using Laboratorio_Compresión.Controllers;
 
 namespace Laboratorio_Compresión
@@ -21,7 +19,7 @@ namespace Laboratorio_Compresión
             #region Caracteres
             //Leer caracteres y contarlos
 
-            Dictionary<char, int> dictionary = Lectura.obtenerDiccionarioFrecuencias(12, path);
+            Dictionary<char, int> dictionary = Lectura.obtenerDiccionarioFrecuencias(1024, path);
 
             dictionary.Add(EOF, 1); //End of file
             #endregion
@@ -33,7 +31,7 @@ namespace Laboratorio_Compresión
 
             //Leer archivo original y sustituir por codigos prefijo
 
-            string textoBinario = Lectura.textoBinario(12, path, diccionario);
+            string textoBinario = Lectura.textoBinario(1024, path, diccionario);
             textoBinario += diccionario[EOF]; //End of file
 
             #endregion
@@ -44,7 +42,7 @@ namespace Laboratorio_Compresión
             string nombreNuevoArchivo = Path.GetFileNameWithoutExtension(path) + ".huff";
             string rutaComprimido = Path.Combine(HomeController.directorioHuffman, nombreNuevoArchivo);
 
-            crearArchivo(rutaComprimido);
+            Archivo.crearArchivo(rutaComprimido);
             
             //Construir texto huffman 
             string Byte = ""; //Valor de 8 bits 
@@ -61,7 +59,7 @@ namespace Laboratorio_Compresión
 
                     if (Byte.Length == 8)
                     {
-                        ByteArrayToFile(rutaComprimido, new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) }); //Escribir en archivo
+                        ByteArrayToFile(rutaComprimido, new[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) }); //Escribir en archivo
                         Byte = "";
                     }
                 }
@@ -75,7 +73,7 @@ namespace Laboratorio_Compresión
                             Byte += "0";
                         }
 
-                        ByteArrayToFile(rutaComprimido, new byte[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
+                        ByteArrayToFile(rutaComprimido, new[] { Convert.ToByte(Convert.ToInt32(Byte, 2)) });
                         Byte = "";
                     }
 
@@ -134,17 +132,17 @@ namespace Laboratorio_Compresión
 
             Dictionary<string, char> codigosPrefijo = leerArchivoConfiguracion(pathConfig, pathCharacters, ref nombreArchivo);
             rutaDescomprimido += "/" + nombreArchivo;
-            
+
             //Crear nuevo archivo en blanco
 
-            crearArchivo(rutaDescomprimido);
+            Archivo.crearArchivo(rutaDescomprimido);
 
             //Leer arreglos de bits y guardarlos en memoria principal
 
             string bits = "";
             
-            int bufferLength = 12;
-            var buffer = new byte[bufferLength];
+            int bufferLength = 1024;
+            byte[] buffer;
 
             using (var file = new FileStream(path, FileMode.Open))
             {
@@ -173,7 +171,7 @@ namespace Laboratorio_Compresión
                                     if (codigosPrefijo[tmp] != EOF)
                                     {
                                         bits = bits.Remove(0, tmp.Length); //Remover cadena de bits encontrada
-                                        ByteArrayToFile(rutaDescomprimido, new byte[] { Convert.ToByte(Convert.ToInt32(codigosPrefijo[tmp])) });
+                                        ByteArrayToFile(rutaDescomprimido, new[] { Convert.ToByte(Convert.ToInt32(codigosPrefijo[tmp])) });
                                         tmp = "";
                                     }
                                     else
@@ -192,9 +190,9 @@ namespace Laboratorio_Compresión
                     }
                 }
             }
-            //Repetir hasta leer todo el archivo
+            //Repetir hasta leertodo el archivo
 
-            HomeController.currentFile = rutaDescomprimido;
+            HomeController.currentFile = rutaDescomprimido; 
         }
         
         private static void ByteArrayToFile(string fileName, byte[] byteArray)
@@ -211,31 +209,7 @@ namespace Laboratorio_Compresión
                 throw new Exception("Exception caught in process: {0}", ex);
             }
         }
-
-        private static void crearArchivo(string path)
-        {
-            if (System.IO.File.Exists(path))
-            {
-                System.IO.File.Delete(path);
-            }
-
-            FileStream fs = System.IO.File.Create(path);
-            fs.Close();
-        }
-
-        private static void escribirEnArchivo(string path, string text)
-        {
-            if (File.Exists(path))
-            {
-                File.AppendAllText(path, text);
-            }
-            else
-            {
-                throw new Exception("El Archivo no existe");
-            }
-            
-        }
-
+        
         private static void configuracionParaDescomprimir(string path, Dictionary<char, string> diccionario)
         {
 
@@ -244,21 +218,21 @@ namespace Laboratorio_Compresión
             string rutaCharacters = Path.Combine(HomeController.directorioHuffmanConfig, nombreArchivo + ".char");
             string rutaPrefijos = Path.Combine(HomeController.directorioHuffmanConfig, nombreArchivo + ".config");
             
-            crearArchivo(rutaCharacters);
-            crearArchivo(rutaPrefijos);
+            Archivo.crearArchivo(rutaCharacters);
+            Archivo.crearArchivo(rutaPrefijos);
 
             var csv = new StringBuilder();
-            string configuracion = string.Format("{0}", Path.GetFileName(path)); //Linea con informacion del archivo
+            string configuracion = $"{Path.GetFileName(path)}"; //Linea con informacion del archivo
             csv.AppendLine(configuracion);
 
             foreach (var item in diccionario)
             {
-                ByteArrayToFile(rutaCharacters, new byte[] { Convert.ToByte(item.Key) }); //Escribir en archivo
+                ByteArrayToFile(rutaCharacters, new[] { Convert.ToByte(item.Key) }); //Escribir en archivo
                 csv.AppendLine(item.Value);
             }
             
             //Escribir
-            System.IO.File.WriteAllText(rutaPrefijos, csv.ToString());
+            File.WriteAllText(rutaPrefijos, csv.ToString());
 
         }
 
@@ -267,17 +241,17 @@ namespace Laboratorio_Compresión
 
             Dictionary<string, char> configuracion = new Dictionary<string, char>();
 
-            if (!System.IO.File.Exists(pathConfig))
+            if (!File.Exists(pathConfig))
             {
                 throw new Exception("No existe el archivo");
             }
-            else if (!System.IO.File.Exists(pathCharacters))
+            else if (!File.Exists(pathCharacters))
             {
                 throw new Exception("No existe el archivo");
             }
             else
             {
-                byte[] bytes = System.IO.File.ReadAllBytes(pathCharacters);
+                byte[] bytes = File.ReadAllBytes(pathCharacters);
                 int i = 0;
 
                 using (var reader = new StreamReader(pathConfig))
@@ -295,15 +269,8 @@ namespace Laboratorio_Compresión
                         }
                         else
                         {
-                            try
-                            {
-                                configuracion.Add(line, Convert.ToChar(bytes[i]));
-                                i++;
-                            }
-                            catch (Exception)
-                            {
-                                throw;
-                            }
+                            configuracion.Add(line, Convert.ToChar(bytes[i]));
+                            i++;
                         }
                     }
                     reader.Close();

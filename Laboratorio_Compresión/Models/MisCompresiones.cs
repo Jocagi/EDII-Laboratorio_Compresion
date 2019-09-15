@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.IO;
-using System.Text;
 
 using Laboratorio_Compresión.Controllers;
 
@@ -47,44 +45,15 @@ namespace Laboratorio_Compresión.Models
         {
             return Math.Round(100 - ( (Convert.ToDouble(pesoComprimido) / Convert.ToDouble(pesoOriginal)) * 100 ), 2);
         }
-
-        private static void leerAchivos()
-        {
-            //Eliminar la lista en controlador
-            HomeController.misCompresiones.Clear();
-
-            //Resumen: Se leen todos los archivos comprimidos crea la lista en el controlador
-
-            string carpetaArchivos = HomeController.directorioUploads;
-            string carpetaHuff = HomeController.directorioHuffman;
-
-            //Se enlistan todos los archivos en la carpeta de huffman, se leen y definen las propiedades
-
-            DirectoryInfo infoArchivo = new DirectoryInfo(carpetaArchivos);
-            FileInfo[] listaArchivos = infoArchivo.GetFiles();
-
-            DirectoryInfo infoHuff = new DirectoryInfo(carpetaHuff);
-            FileInfo[] listaHuffman = infoHuff.GetFiles();
-
-            foreach (var archivoComprimido in listaHuffman)
-            {
-                foreach (var archivoOriginal in listaArchivos)
-                {
-                    if (Path.GetFileNameWithoutExtension(archivoComprimido.FullName) == Path.GetFileNameWithoutExtension(archivoOriginal.FullName))
-                    {
-                        Controllers.HomeController.misCompresiones.Add(new MisCompresiones(archivoOriginal.Name, archivoOriginal.Length, archivoComprimido.Length) );
-                    }
-                }
-            }
-        }
-
+        
         public static void agregarNuevaCompresion(MisCompresiones nuevo)
         {
             string path = HomeController.archivoMisCompresiones;
 
             using (StreamWriter sw = File.AppendText(path))
             {
-                string text = string.Format("{0}, {1}, {2}, {3}", nuevo.nombreOriginal, nuevo.razonDeCompresion, nuevo.factorDeCompresion, nuevo.porcentajeDeCompresion);
+                string text =
+                    $"{nuevo.nombreOriginal}, {nuevo.razonDeCompresion}, {nuevo.factorDeCompresion}, {nuevo.porcentajeDeCompresion}";
                 sw.WriteLine(text);
             }
 
@@ -97,7 +66,7 @@ namespace Laboratorio_Compresión.Models
 
             Stack<MisCompresiones> lista = new Stack<MisCompresiones>();
 
-            if (!System.IO.File.Exists(path)) //No existe el archivo
+            if (!File.Exists(path)) //No existe el archivo
             {
                 File.Create(path);
             }
@@ -111,17 +80,10 @@ namespace Laboratorio_Compresión.Models
 
                         var line = reader.ReadLine();
 
-                        string[] datos = line.Split(','); //dividir datos
+                        string[] datos = line?.Split(','); //dividir datos
 
-                        try
-                        {
-                            lista.Push(new MisCompresiones(datos[0], Convert.ToDouble(datos[1]), Convert.ToDouble(datos[2]), Convert.ToDouble(datos[3])));
-                        }
-                        catch (Exception)
-                        {
-                            throw;
-                        }
-
+                        lista.Push(new MisCompresiones(datos?[0], Convert.ToDouble(datos?[1]),
+                            Convert.ToDouble(datos?[2]), Convert.ToDouble(datos?[3])));
                     }
                     reader.Close();
                 }

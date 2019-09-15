@@ -1,33 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Laboratorio_Compresión.Models;
-using System.Text;
 
 namespace Laboratorio_Compresión.Controllers
 {
     public class HomeController : Controller
     {
-
+        #region Variables
         //Lista de archivos comprimidos
         public static List<MisCompresiones> misCompresiones = new List<MisCompresiones>();
         public static string directorioUploads = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Uploads");
         public static string directorioHuffman = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Huffman");
+        public static string directorioLZW = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/LZW");
         public static string directorioHuffmanConfig = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/HuffmanConfig");
         public static string directorioHuffmanDecompress = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Decompression");
         public static string archivoMisCompresiones = System.Web.HttpContext.Current.Server.MapPath("~/Archivos/Mis_Compresiones/Lista.txt");
-        public static string mensaje = "";
         public static string currentFile = "";
+        #endregion
         
         public ActionResult Index()
         {
             return View();
         }
-      
-        
+
+        #region Huffman
         public ActionResult ComprimirHuffman()
         {
             return View();
@@ -43,7 +42,7 @@ namespace Laboratorio_Compresión.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                ViewBag.Message = "ERROR:" + ex.Message;
                 throw;
             }
 
@@ -68,12 +67,63 @@ namespace Laboratorio_Compresión.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                ViewBag.Message = "ERROR:" + ex.Message;
                 throw;
             }
 
             return RedirectToAction("Index");
         }
+        #endregion
+
+        #region LZW
+        public ActionResult ComprimirLZW()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult ComprimirLZW(HttpPostedFileBase file)
+        {
+            try
+            {
+                string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
+
+                UploadFile(path, file);
+                LZW.comprimir(path);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = "ERROR:" + ex.Message;
+                throw;
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult DescomprimirLZW()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult DescomprimirLZW(HttpPostedFileBase file)
+        {
+            try
+            {
+                string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
+
+                UploadFile(path, file);
+                LZW.descomprimir(path);
+
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = "ERROR:" + ex.Message;
+                throw;
+            }
+
+            return RedirectToAction("Index");
+        }
+        
+        #endregion
 
         public ActionResult MisCompresiones()
         {
@@ -84,7 +134,6 @@ namespace Laboratorio_Compresión.Controllers
         public ActionResult DownloadFile() 
         {
             string path = currentFile;
-            string fileName = Path.GetFileName(path);
 
             byte[] filedata = System.IO.File.ReadAllBytes(path);
             string contentType = MimeMapping.GetMimeMapping(path);
@@ -119,7 +168,7 @@ namespace Laboratorio_Compresión.Controllers
                 }
                 catch (Exception ex)
                 {
-                    ViewBag.Message = "ERROR:" + ex.Message.ToString();
+                    ViewBag.Message = "ERROR:" + ex.Message;
                 }
             else
             {

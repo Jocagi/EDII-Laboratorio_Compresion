@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace Laboratorio_Compresión
 {
@@ -83,12 +81,12 @@ namespace Laboratorio_Compresión
             string binario = "";
 
             //Llamada a recorrer el arbol binario
-            recorridoArbol(this.Raiz, ref diccionario, binario);
+            codigosPrefijo(this.Raiz, ref diccionario, binario);
 
             return diccionario;
         }
 
-        private void recorridoArbol(Nodo nodo, ref Dictionary<char, string> diccionario, string binario)
+        private void codigosPrefijo(Nodo nodo, ref Dictionary<char, string> diccionario, string binario)
         {
             //Agrega un 0 si se recorre hacia la izquierda y un 1 si se va hacia la derecha hasta llegar a la hoja que contiene el simbolo
 
@@ -97,18 +95,14 @@ namespace Laboratorio_Compresión
             string listaDerecha = binario;
 
             if (!nodo.esHoja())
-            {
-
+            { 
                 //Recorrer nodos a la izquierda
-                //listaIzquierda.Add(false);
                 listaIzquierda += "0";
-                recorridoArbol(nodo.izquierdo, ref diccionario, listaIzquierda);
+                codigosPrefijo(nodo.izquierdo, ref diccionario, listaIzquierda);
 
                 //Recorrer nodos a la derecha
-                //listaDerecha.Add(true);
                 listaDerecha += "1";
-                recorridoArbol(nodo.derecho, ref diccionario, listaDerecha);
-
+                codigosPrefijo(nodo.derecho, ref diccionario, listaDerecha);
             }
             else
             {
@@ -116,7 +110,5 @@ namespace Laboratorio_Compresión
                 diccionario.Add(nodo.getChar(), binario);
             }
         }
-
-
     }
 }

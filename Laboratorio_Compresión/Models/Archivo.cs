@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Web;
 
 namespace Laboratorio_Compresión.Models
 {
     public class Archivo
     {
-        public string caracter { get; set; }
-        public int frecuencia { get; set;}
-
         public static void crearArchivo(string path)
         {
             if (System.IO.File.Exists(path))

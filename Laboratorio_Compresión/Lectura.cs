@@ -13,18 +13,15 @@ namespace Laboratorio_Compresión
         public void Leer(int lenght, string path)
         {
             List<char> tata = new List<char>();
-
-            int bufferLength = lenght;
-
-            var buffer = new byte[bufferLength];
-
+            
             using (var file = new FileStream(path, FileMode.Open))
             {
                 using (var reader = new BinaryReader(file))
                 {
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
-                        buffer = reader.ReadBytes(bufferLength);
+                        var buffer = reader.ReadBytes(bufferLength);
+
                         foreach (var item in buffer)
                         {
                             tata.Add((char) item);
@@ -36,10 +33,8 @@ namespace Laboratorio_Compresión
 
         public static void Escritura(string text, string path)
         {
-            List<char> tata = new List<char>();
-            int txt = Convert.ToInt32(text);
-            int bufferLength = txt;
             var buffer = new byte[bufferLength];
+
             using (var file = new FileStream(path, FileMode.Create))
             {
                 using (var writer = new BinaryWriter(file))
@@ -52,9 +47,16 @@ namespace Laboratorio_Compresión
                     writer.Write(buffer);
                 }
             }
-
         }
 
+        public static void InsertData(string path, int position, byte[] data)
+        {
+            using (Stream stream = File.Open(path, FileMode.Open))
+            {
+                stream.Position = position;
+                stream.Write(data, 0, data.Length);
+            }
+        }
         #endregion
 
         #region Huffman
@@ -149,7 +151,7 @@ namespace Laboratorio_Compresión
 
             return dictionary;
         }
-
+        
         #endregion
     }
 }

@@ -55,7 +55,7 @@ namespace Laboratorio_Compresión
              return prefijos;
          }*/
         #endregion
-
+            
         public static List<int> comprimir(string path)
         {
             string Data = System.IO.File.ReadAllText(path, Encoding.Default); //buffer
@@ -69,8 +69,8 @@ namespace Laboratorio_Compresión
             string c = string.Empty;
             List<int> comprimir = new List<int>();
 
-            //Lee desde el path
-            foreach(char t in path)
+            //Sorry, ahora ya deberia leer el archivo
+            foreach(char t in Caracteres)
             {
                 string ct = c + t;
                 if (diccionario.ContainsKey(ct))

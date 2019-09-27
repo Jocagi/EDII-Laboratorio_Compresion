@@ -55,7 +55,6 @@ namespace Laboratorio_Compresión
             #endregion
 
             //Analizar texto, creando diccionario y escribiendo en archivo
-
             #region Algoritmo
 
             //Aqui va tu codigo, Genesis
@@ -75,12 +74,10 @@ namespace Laboratorio_Compresión
             int byteLenght;
             int dictionaryLenght;
             Dictionary<int, char> dictionary = new Dictionary<int, char>();
-
-            bool firstbyte = true;
-            bool secondbyte = false;
-
+            
             string current = "";
             string previous = "";
+            string newItem = "";
             
             using (var file = new FileStream(path, FileMode.Open))
             {
@@ -107,9 +104,15 @@ namespace Laboratorio_Compresión
 
                         foreach (var item in buffer)
                         {
-                            //ToDo... Descomprimir
-                        }
 
+                            //ToDo... Descomprimir
+
+                            //Leer byte
+                            //Tomar string y buscarlo en diccionario
+                            //El resultado es current
+                            //Se agrega al diccionario previous + primer char del current
+
+                        }
                     }
                 }
             }

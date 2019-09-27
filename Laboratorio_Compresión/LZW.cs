@@ -112,8 +112,43 @@ namespace Laboratorio_Compresión
             }*/
         }
 
-        public static void descomprimir(string path)
+        public static string descomprimir(string path)
         {
+            string Data = System.IO.File.ReadAllText(path, Encoding.Default); //buffer
+            List<char> Caracteres = Data.ToList<char>();
+
+            //Volver a crear diccionario
+            Dictionary<int, string> segundo = new Dictionary<int, string>();
+            for (int i = 0; i < 256; i++)
+                segundo.Add(i, ((char)i).ToString());
+
+            string c = segundo[Caracteres[0]];
+            Caracteres.RemoveAt(0);
+            StringBuilder descomprimir = new StringBuilder(c);
+
+            foreach(int t in Caracteres)
+            {
+                string entry = null;
+                if(segundo.ContainsKey(t))
+                {
+                    entry = segundo[t];
+                }
+                else if (t==segundo.Count)
+                {
+                    entry = c + c[0];
+                }
+
+                descomprimir.Append(entry);
+
+                //  Agregar nueva frase
+
+                segundo.Add(segundo.Count, c + entry[0]);
+
+                c = entry;
+                    
+            }
+
+            return descomprimir.ToString();
 
         }
     }

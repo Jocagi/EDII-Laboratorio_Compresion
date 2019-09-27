@@ -56,7 +56,7 @@ namespace Laboratorio_Compresión
          }*/
         #endregion
             
-        public static List<int> comprimir(string path)
+        public static void comprimir(string path)
         {
             string Data = System.IO.File.ReadAllText(path, Encoding.Default); //buffer
             List<char> Caracteres = Data.ToList<char>();
@@ -89,30 +89,9 @@ namespace Laboratorio_Compresión
 
             if (!string.IsNullOrEmpty(c))
                 comprimir.Add(diccionario[c]);
-
-            return comprimir;
-            //char[] Carac = Caracteres.ToArray();
-           // Dictionary<char, int> diccionario = new Dictionary<char, int>();
-            /*foreach (var item in Caracteres)
-            {
-                if(!diccionario.Keys.Contains(item))
-                {
-                    diccionario.Add(item, 1);
-                }
-                else if(diccionario.Keys.Contains(item))
-                {
-                  
-                    for (int i = 0; i < Carac.Length; i++)
-                    {
-                        string charsStr = new string(Carac);
-                        diccionario.Add(item+1,  1);
-                    } 
-                }
-                
-            }*/
         }
 
-        public static string descomprimir(string path)
+        public static void descomprimir(string path)
         {
             string Data = System.IO.File.ReadAllText(path, Encoding.Default); //buffer
             List<char> Caracteres = Data.ToList<char>();
@@ -147,8 +126,6 @@ namespace Laboratorio_Compresión
                 c = entry;
                     
             }
-
-            return descomprimir.ToString();
 
         }
     }

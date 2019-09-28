@@ -164,7 +164,7 @@ namespace Laboratorio_Compresión
 
                     int key = 0;
                     string c = diccionario[(int) reader.ReadByte()];
-                    string descomprimir = "";
+                    string descomprimir = c;
 
                     //Buffer para descomprimir
                     while (reader.BaseStream.Position != reader.BaseStream.Length)

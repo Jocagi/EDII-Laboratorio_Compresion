@@ -33,7 +33,7 @@ namespace Laboratorio_Compresión
 
         public static void Escritura(string text, string path)
         {
-            var buffer = new byte[bufferLength];
+            var buffer = new byte[text.Length];
 
             using (var file = new FileStream(path, FileMode.Append))
             {
@@ -41,14 +41,7 @@ namespace Laboratorio_Compresión
                 {
                     for (int i = 0; i < buffer.Length; i++)
                     {
-                        if (text.Length >= i + 1)
-                        {
-                            buffer[i] = Convert.ToByte(text[i]);
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        buffer[i] = Convert.ToByte(text[i]);
                     }
 
                     writer.Write(buffer);

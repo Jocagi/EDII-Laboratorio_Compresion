@@ -11,7 +11,7 @@ namespace Laboratorio_Compresión
 {
     public static class Huffman
     {
-        private static char EOF = '\u0003';
+        private const char EOF = '\u0003';
 
         public static void comprimir(string path)
         {
@@ -19,7 +19,7 @@ namespace Laboratorio_Compresión
             #region Caracteres
             //Leer caracteres y contarlos
 
-            Dictionary<char, int> dictionary = Lectura.obtenerDiccionarioFrecuencias(1024, path);
+            Dictionary<char, int> dictionary = Lectura.obtenerDiccionarioFrecuencias(path);
 
             dictionary.Add(EOF, 1); //End of file
             #endregion
@@ -31,7 +31,7 @@ namespace Laboratorio_Compresión
 
             //Leer archivo original y sustituir por codigos prefijo
 
-            string textoBinario = Lectura.textoBinario(1024, path, diccionario);
+            string textoBinario = Lectura.textoBinario(path, diccionario);
             textoBinario += diccionario[EOF]; //End of file
 
             #endregion

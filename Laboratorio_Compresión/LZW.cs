@@ -46,7 +46,8 @@ namespace Laboratorio_Compresión
             List<int> comprimir = new List<int>();
 
             string bits = "";
-            
+            int contador = 0 ;
+
             //Buffer para comprimir
             using (var file = new FileStream(path, FileMode.Open))
             {
@@ -55,7 +56,7 @@ namespace Laboratorio_Compresión
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
                         var buffer = reader.ReadBytes(count: bufferLength);
-
+                        
                         foreach (var t in buffer)
                         {
                             string ct = c + ((char) t);
@@ -118,6 +119,17 @@ namespace Laboratorio_Compresión
             }
 
             #endregion
+
+            #region FileInfo
+
+            HomeController.currentFile = rutaComprimido;
+
+            FileInfo originalFile = new FileInfo(path);
+            FileInfo compressedFile = new FileInfo(rutaComprimido);
+            MisCompresiones.agregarNuevaCompresion(new MisCompresiones(Path.GetFileName(path), originalFile.Length, compressedFile.Length)); //Anadir a mis compresiones
+
+            #endregion
+
         }
 
         public static void descomprimir(string path)
@@ -152,8 +164,8 @@ namespace Laboratorio_Compresión
 
                     int key = 0;
                     string c = diccionario[(int) reader.ReadByte()];
-                    StringBuilder descomprimir = new StringBuilder(c);
-                    
+                    string descomprimir = "";
+
                     //Buffer para descomprimir
                     while (reader.BaseStream.Position != reader.BaseStream.Length)
                     {
@@ -161,7 +173,8 @@ namespace Laboratorio_Compresión
 
                         foreach (var t in buffer)
                         {
-                            if (diccionario.Count >= maxDictionaryLenght)
+
+                            if (diccionario.Count + 1 >= maxDictionaryLenght)
                             {
                                 byteLenght++;
                                 maxDictionaryLenght = (int)Math.Pow(2, byteLenght);
@@ -174,7 +187,7 @@ namespace Laboratorio_Compresión
                             {
                                 key = Convert.ToInt32(bits.Substring(0, byteLenght), 2);
                                 bits = bits.Remove(0, byteLenght);
-
+                                
                                 string entry = null;
                                 if (diccionario.ContainsKey(key))
                                 {
@@ -185,20 +198,30 @@ namespace Laboratorio_Compresión
                                     entry = c + c[0];
                                 }
 
-                                descomprimir.Append(entry);
-                                ByteArrayToFile(rutaArchivo, new[] { Convert.ToByte(entry) }); //Escribir en archivo
-
+                                descomprimir += entry;
+                                
                                 //  Agregar nueva frase al diccionario
 
-                                diccionario.Add(diccionario.Count, c + entry[0]);
+                                if (entry != null)
+                                {
+                                    diccionario.Add(diccionario.Count, c + entry[0]);
+                                }
 
                                 c = entry;
-
+                                
                             }
                         }
+
+                        Lectura.Escritura(descomprimir, rutaArchivo);
+                        descomprimir = "";
+
                     }
                 }
             }
+
+            
+            HomeController.currentFile = rutaArchivo; //Descargar
+
         }
 
         private static Dictionary<int, string> obtenerDiccionarioDescompresion()

@@ -35,13 +35,20 @@ namespace Laboratorio_Compresión
         {
             var buffer = new byte[bufferLength];
 
-            using (var file = new FileStream(path, FileMode.Create))
+            using (var file = new FileStream(path, FileMode.Append))
             {
                 using (var writer = new BinaryWriter(file))
                 {
                     for (int i = 0; i < buffer.Length; i++)
                     {
-                        buffer[i] = Convert.ToByte(100 + i);
+                        if (text.Length >= i + 1)
+                        {
+                            buffer[i] = Convert.ToByte(text[i]);
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
 
                     writer.Write(buffer);

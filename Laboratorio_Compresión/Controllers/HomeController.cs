@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web;
 using System.Web.Mvc;
+using System.Text;
 using Laboratorio_Compresión.Models;
 
 namespace Laboratorio_Compresión.Controllers
@@ -122,8 +123,52 @@ namespace Laboratorio_Compresión.Controllers
 
             return RedirectToAction("Index");
         }
-        
+
         #endregion
+
+#region Aritmetico
+        public ActionResult Aritmetica()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Aritmetica(HttpPostedFileBase file)
+        {
+            try
+            {
+                string path = Path.Combine(directorioUploads, Path.GetFileName(file.FileName));
+                UploadFile(path, file);
+                string Data = System.IO.File.ReadAllText(path, Encoding.Default);
+                int[] fuenteUno = new int[256];
+                float[] L = new float[256];
+                float[] H = new float[256];
+                int longitud = file.ContentLength;
+                int primero = 0;
+                int segundo = 0;
+                for (int i = 0; i < 255; i++)
+                {
+                    if(fuenteUno[i]>0)
+                    {
+                        primero = segundo;
+                        segundo = segundo + fuenteUno[i];
+                        L[i] = (float)primero / longitud;
+                        H[i] = (float)segundo / longitud;
+                    }
+                }
+                //Yo espero que jale los datos
+                Aritmetico.Aritmetica(path, L, H);
+                
+ 
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = "ERROR:" + ex.Message;
+                throw;
+            }
+
+            return RedirectToAction("Index");
+        }
+#endregion
 
         public ActionResult MisCompresiones()
         {
